@@ -1,0 +1,9 @@
+<app-todo-item
+  *ngFor="let todoVar of todos"
+  [todo]="todoVar"
+  (todoUpdated)="showUserNotification($event)"
+>
+</app-todo-item>
+
+<input type="text" [(ngModel)]="inputValue" />
+<button (click)="addTodoItem()">Add</button>
