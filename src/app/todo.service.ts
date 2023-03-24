@@ -1,17 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { Todo } from './model/todo';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TodoService {
-  private linkGet = "https://europe-west1-cours-angular-263913.cloudfunctions.net/todoapp/todo" ; 
-  private linkDelete = "https://europe-west1-cours-angular-263913.cloudfunctions.net/todoapp/todo" ; 
-  private linkPost = "https://europe-west1-cours-angular-263913.cloudfunctions.net/todoapp/todo" ;
-  private linkPut =  "https://europe-west1-cours-angular-263913.cloudfunctions.net/todoapp/todo" ;
-  private todos = Observable<Todo[]> ; 
+  private linkGet =
+    'https://europe-west1-cours-angular-263913.cloudfunctions.net/todoapp/todo';
+  private linkDelete =
+    'https://europe-west1-cours-angular-263913.cloudfunctions.net/todoapp/todo';
+  private linkPost =
+    'https://europe-west1-cours-angular-263913.cloudfunctions.net/todoapp/todo';
+  private linkPut =
+    'https://europe-west1-cours-angular-263913.cloudfunctions.net/todoapp/todo';
 
   constructor(private http: HttpClient) {}
 
@@ -27,14 +31,22 @@ export class TodoService {
       creationDate: new Date().valueOf(),
     };
 
-    return this.http.post<boolean>(this.linkPost, todo);
+    return (
+      this.http
+        .post<Todo>(this.linkPost, todo)
+        .pipe(catchError(() => of(false))),
+      of(true)
+    );
   }
 
   updateTodo(todo: Todo): Observable<boolean> {
-    return this.http.put<boolean>(`${this.linkPut}/${todo.id}`, todo);
-  }
-
-  deleteTodoById(id: string): Observable<boolean> {
-    return this.http.delete<boolean>(`${this.linkDelete}/${id}`);
+    const indexToUpdate = this.getTodos().subscribe((todos) => {
+      todos.findIndex((e1) => e1.id === todo.id);
+    });
+    return (
+      this.http
+        .put<Todo>(this.linkPut.concat(indexToUpdate.toString()), todo)
+        .pipe(map((todos) => todos.splice(indexToUpdate,1,todo)))
+    );
   }
 }
