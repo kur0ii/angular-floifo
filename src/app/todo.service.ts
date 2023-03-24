@@ -1,44 +1,40 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Todo } from './model/todo';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TodoService {
-  private todos: Todo[] = [
-    {
-      label: 'Faire les courses',
-      done: false,
-      id: Math.floor(Math.random() * 1000).toString(),
-      creationDate: new Date().valueOf(),
-    },
-  ];
+  private linkGet = "https://europe-west1-cours-angular-263913.cloudfunctions.net/todoapp/todo" ; 
+  private linkDelete = "https://europe-west1-cours-angular-263913.cloudfunctions.net/todoapp/todo" ; 
+  private linkPost = "https://europe-west1-cours-angular-263913.cloudfunctions.net/todoapp/todo" ;
+  private linkPut =  "https://europe-west1-cours-angular-263913.cloudfunctions.net/todoapp/todo" ;
+  private todos = Observable<Todo[]> ; 
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   getTodos(): Observable<Todo[]> {
-    return of(this.todos);
+    return this.http.get<Todo[]>(this.linkGet);
   }
 
   createTodo(label: string): Observable<boolean> {
-    const newTodos = {
+    const todo: Todo = {
       label: label,
       done: false,
       id: Math.floor(Math.random() * 1000).toString(),
       creationDate: new Date().valueOf(),
     };
 
-    return new Observable<boolean>((observer) => {
-      this.todos.push(newTodos);
-      observer.next(true);
-      observer.complete();
-    });
+    return this.http.post<boolean>(this.linkPost, todo);
   }
 
-  updateTodo(todo: Todo): void {
-    const indexToUpdate = this.todos.findIndex((el) => el.id === todo.id);
-    this.todos.splice(indexToUpdate, 1, todo);
+  updateTodo(todo: Todo): Observable<boolean> {
+    return this.http.put<boolean>(`${this.linkPut}/${todo.id}`, todo);
+  }
+
+  deleteTodoById(id: string): Observable<boolean> {
+    return this.http.delete<boolean>(`${this.linkDelete}/${id}`);
   }
 }
