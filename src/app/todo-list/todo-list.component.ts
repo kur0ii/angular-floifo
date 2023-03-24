@@ -25,13 +25,17 @@ export class TodoListComponent implements OnInit {
 
   showUserNotification(todo: Todo) {
     this.todoService.updateTodo(todo);
-    this.todos = this.todoService.getTodos();
+    this.todoService.getTodos().subscribe((todos) => {
+      this.todos = todos;
+    });
     M.toast({ html: `Le todo ${todo.label} a été mis à jour` });
   }
 
   constructor(private todoService: TodoService) {}
 
   ngOnInit() {
-    this.todos = this.todoService.getTodos();
+    this.todoService.getTodos().subscribe((todos) => {
+      this.todos = todos;
+    });
   }
 }
