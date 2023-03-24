@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Todo } from './model/todo';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,22 +10,22 @@ export class TodoService {
     {
       label: 'Faire les courses',
       done: false,
-      id: Math.floor(Math.random() * 1000),
+      id: Math.floor(Math.random() * 1000).toString(),
       creationDate: new Date().valueOf(),
     },
   ];
 
   constructor() {}
 
-  getTodos(): Todo[] {
-    return [...this.todos];
+  getTodos(): Observable<Todo[]> {
+    return of(this.todos);
   }
 
   createTodo(label: string): void {
     this.todos.push({
       label: label,
       done: false,
-      id: Math.floor(Math.random() * 1000),
+      id: Math.floor(Math.random() * 1000).toString(),
       creationDate: new Date().valueOf(),
     });
   }
