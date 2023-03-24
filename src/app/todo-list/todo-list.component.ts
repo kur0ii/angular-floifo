@@ -16,7 +16,9 @@ export class TodoListComponent implements OnInit {
 
   addTodoItem() {
     this.todoService.createTodo(this.inputValue);
-    this.todos = this.todoService.getTodos();
+    this.todoService.getTodos().subscribe((todos) => {
+      this.todos = todos;
+    });
     M.toast({ html: `Nouveau todo :  ${this.inputValue}` });
     this.inputValue = '';
   }
